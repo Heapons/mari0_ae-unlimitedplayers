@@ -1535,11 +1535,11 @@ function menu_draw()
 				love.graphics.setColor(100, 100, 100, 255)
 			end
 			
-			properprintF(TEXT["knockback:"], 30*scale, 80*scale)
+			properprintF(TEXT["knockback:"], 30*scale, 78*scale)
 			if portalknockback then
-				properprintF(TEXT["on"], (posX-utf8.len(TEXT["on"])*8)*scale, 80*scale)
+				properprintF(TEXT["on"], (posX-utf8.len(TEXT["on"])*8)*scale, 78*scale)
 			else
-				properprintF(TEXT["off"], (posX-utf8.len(TEXT["off"])*8)*scale, 80*scale)
+				properprintF(TEXT["off"], (posX-utf8.len(TEXT["off"])*8)*scale, 78*scale)
 			end
 			
 			if optionsselection == 4 then
@@ -1548,11 +1548,11 @@ function menu_draw()
 				love.graphics.setColor(100, 100, 100, 255)
 			end
 			
-			properprintF(TEXT["bullettime:"], 30*scale, 95*scale)
+			properprintF(TEXT["bullettime:"], 30*scale, 91*scale)
 			if bullettime then
-				properprintF(TEXT["on"], (posX-utf8.len(TEXT["on"])*8)*scale, 95*scale)
+				properprintF(TEXT["on"], (posX-utf8.len(TEXT["on"])*8)*scale, 91*scale)
 			else
-				properprintF(TEXT["off"], (posX-utf8.len(TEXT["off"])*8)*scale, 95*scale)
+				properprintF(TEXT["off"], (posX-utf8.len(TEXT["off"])*8)*scale, 91*scale)
 			end
 			
 			if optionsselection == 5 then
@@ -1561,11 +1561,11 @@ function menu_draw()
 				love.graphics.setColor(100, 100, 100, 255)
 			end
 			
-			properprintF(TEXT["huge mario:"], 30*scale, 110*scale)
+			properprintF(TEXT["huge mario:"], 30*scale, 104*scale)
 			if bigmario then
-				properprintF(TEXT["on"], (posX-utf8.len(TEXT["on"])*8)*scale, 110*scale)
+				properprintF(TEXT["on"], (posX-utf8.len(TEXT["on"])*8)*scale, 104*scale)
 			else
-				properprintF(TEXT["off"], (posX-utf8.len(TEXT["off"])*8)*scale, 110*scale)
+				properprintF(TEXT["off"], (posX-utf8.len(TEXT["off"])*8)*scale, 104*scale)
 			end
 			
 			if optionsselection == 6 then
@@ -1574,11 +1574,11 @@ function menu_draw()
 				love.graphics.setColor(100, 100, 100, 255)
 			end
 			
-			properprintF(TEXT["goomba attack:"], 30*scale, 125*scale)
+			properprintF(TEXT["goomba attack:"], 30*scale, 117*scale)
 			if goombaattack then
-				properprintF(TEXT["on"], (posX-utf8.len(TEXT["on"])*8)*scale, 125*scale)
+				properprintF(TEXT["on"], (posX-utf8.len(TEXT["on"])*8)*scale, 117*scale)
 			else
-				properprintF(TEXT["off"], (posX-utf8.len(TEXT["off"])*8)*scale, 125*scale)
+				properprintF(TEXT["off"], (posX-utf8.len(TEXT["off"])*8)*scale, 117*scale)
 			end
 			
 			if optionsselection == 7 then
@@ -1587,11 +1587,11 @@ function menu_draw()
 				love.graphics.setColor(100, 100, 100, 255)
 			end
 			
-			properprintF(TEXT["sonic rainboom:"], 30*scale, 140*scale)
+			properprintF(TEXT["sonic rainboom:"], 30*scale, 130*scale)
 			if sonicrainboom then
-				properprintF(TEXT["on"], (posX-utf8.len(TEXT["on"])*8)*scale, 140*scale)
+				properprintF(TEXT["on"], (posX-utf8.len(TEXT["on"])*8)*scale, 130*scale)
 			else
-				properprintF(TEXT["off"], (posX-utf8.len(TEXT["off"])*8)*scale, 140*scale)
+				properprintF(TEXT["off"], (posX-utf8.len(TEXT["off"])*8)*scale, 130*scale)
 			end
 			
 			if optionsselection == 8 then
@@ -1600,11 +1600,11 @@ function menu_draw()
 				love.graphics.setColor(100, 100, 100, 255)
 			end
 			
-			properprintF(TEXT["playercollision:"], 30*scale, 155*scale)
+			properprintF(TEXT["playercollision:"], 30*scale, 143*scale)
 			if playercollisions then
-				properprintF(TEXT["on"], (posX-utf8.len(TEXT["on"])*8)*scale, 155*scale)
+				properprintF(TEXT["on"], (posX-utf8.len(TEXT["on"])*8)*scale, 143*scale)
 			else
-				properprintF(TEXT["off"], (posX-utf8.len(TEXT["off"])*8)*scale, 155*scale)
+				properprintF(TEXT["off"], (posX-utf8.len(TEXT["off"])*8)*scale, 143*scale)
 			end
 			
 			if optionsselection == 9 then
@@ -1613,11 +1613,11 @@ function menu_draw()
 				love.graphics.setColor(100, 100, 100, 255)
 			end
 			
-			properprintF(TEXT["infinite time:"], 30*scale, 170*scale)
+			properprintF(TEXT["infinite time:"], 30*scale, 156*scale)
 			if infinitetime then
-				properprintF(TEXT["on"], (posX-utf8.len(TEXT["on"])*8)*scale, 170*scale)
+				properprintF(TEXT["on"], (posX-utf8.len(TEXT["on"])*8)*scale, 156*scale)
 			else
-				properprintF(TEXT["off"], (posX-utf8.len(TEXT["off"])*8)*scale, 170*scale)
+				properprintF(TEXT["off"], (posX-utf8.len(TEXT["off"])*8)*scale, 156*scale)
 			end
 			
 			if optionsselection == 10 then
@@ -1626,11 +1626,11 @@ function menu_draw()
 				love.graphics.setColor(100, 100, 100, 255)
 			end
 			
-			properprintF(TEXT["infinite lives:"], 30*scale, 185*scale)
+			properprintF(TEXT["infinite lives:"], 30*scale, 169*scale)
 			if infinitelives then
-				properprintF(TEXT["on"], (posX-utf8.len(TEXT["on"])*8)*scale, 185*scale)
+				properprintF(TEXT["on"], (posX-utf8.len(TEXT["on"])*8)*scale, 169*scale)
 			else
-				properprintF(TEXT["off"], (posX-utf8.len(TEXT["off"])*8)*scale, 185*scale)
+				properprintF(TEXT["off"], (posX-utf8.len(TEXT["off"])*8)*scale, 169*scale)
 			end
 			
 			if optionsselection == 11 then
@@ -1639,11 +1639,11 @@ function menu_draw()
 				love.graphics.setColor(100, 100, 100, 255)
 			end
 			
-			properprintF(TEXT["dark mode:"], 30*scale, 200*scale)
+			properprintF(TEXT["dark mode:"], 30*scale, 182*scale)
 			if darkmode then
-				properprintF(TEXT["on"], (posX-utf8.len(TEXT["on"])*8)*scale, 200*scale)
+				properprintF(TEXT["on"], (posX-utf8.len(TEXT["on"])*8)*scale, 182*scale)
 			else
-				properprintF(TEXT["off"], (posX-utf8.len(TEXT["off"])*8)*scale, 200*scale)
+				properprintF(TEXT["off"], (posX-utf8.len(TEXT["off"])*8)*scale, 182*scale)
 			end
 
 			if optionsselection == 12 then
@@ -1652,11 +1652,11 @@ function menu_draw()
 				love.graphics.setColor(100, 100, 100, 255)
 			end
 
-			properprintF(TEXT["friendly fire:"], 30*scale, 215*scale)
+			properprintF(TEXT["friendly fire:"], 30*scale, 195*scale)
 			if friendlyfire then
-				properprintF(TEXT["on"], (posX-utf8.len(TEXT["on"])*8)*scale, 215*scale)
+				properprintF(TEXT["on"], (posX-utf8.len(TEXT["on"])*8)*scale, 195*scale)
 			else
-				properprintF(TEXT["off"], (posX-utf8.len(TEXT["off"])*8)*scale, 215*scale)
+				properprintF(TEXT["off"], (posX-utf8.len(TEXT["off"])*8)*scale, 195*scale)
 			end
 		end
 	end
