@@ -8,6 +8,10 @@ Mod of [Alesan99's Entities](https://github.com/alesan99/mari0_ae) primarily foc
 You can play up to... however many players you want to play with! The game is no longer limited to 4 players only.
 
 The only limit here is your <s>imagination</s> ***hardware***.
+
+> [!TIP]
+> Press **1** to quickly reset the player count to *1*.
+
 ## Cheats
 ### Friendly-Fire
 
