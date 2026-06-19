@@ -251,9 +251,13 @@ function checkmagic(s)
 end
 
 function creategame()
+	playerlist = {}
+	playerlist[1] = {connected=true, hats=mariohats[playerconfig], colors=mariocolors[playerconfig], nick=localnick, id="host", ping=0, character=mariocharacter[playerconfig]}
+
 	port = tonumber(guielements.portentry.value)
 	if server_load(port) then
 		lobby_load()
+		net_sendchat(tostring(local_ip) .. ":" .. tostring(port))
 	else
 		--menu_load()
 		return
@@ -261,9 +265,6 @@ function creategame()
 	if usemagic then
 		adjective, noun = magicdns_make()
 	end
-	
-	playerlist = {}
-	playerlist[1] = {connected=true, hats=mariohats[playerconfig], colors=mariocolors[playerconfig], nick=localnick, id="host", ping=0, character=mariocharacter[playerconfig]}
 end
 
 function joingame()

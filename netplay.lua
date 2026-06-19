@@ -75,6 +75,11 @@ function server_load(p)
 	udp:setsockname("*", port)
 	udp:settimeout(0)
 	
+	local success, ip = pcall(function() return socket.dns.toip(socket.dns.gethostname()) end)
+	if success and ip then
+		local_ip = ip
+	end
+	
 	updatetimer = 0
 	actions = {}
 	enemyspawnx = 0
