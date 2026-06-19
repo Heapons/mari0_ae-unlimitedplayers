@@ -4395,11 +4395,11 @@ function startlevel(level, reason)
 	for i = 1, players do
 		if pipestartx then
 			mul = 2/16
-			objects["player"][i] = mario:new(startx+(i-1)*mul, starty-1, i, animation, mariosizes[i], playertype, marioproperties[i])
+			objects["player"][i] = mario:new(startx, starty-1, i, animation, mariosizes[i], playertype, marioproperties[i])
 		elseif startx then
-			objects["player"][i] = mario:new(startx + (i-1)*mul-6/16, starty-1, i, animation, mariosizes[i], playertype, marioproperties[i])
+			objects["player"][i] = mario:new(startx-6/16, starty-1, i, animation, mariosizes[i], playertype, marioproperties[i])
 		else
-			objects["player"][i] = mario:new(1.5 + (i-1)*mul-6/16+1.5, 13, i, animation, mariosizes[i], playertype, marioproperties[i])
+			objects["player"][i] = mario:new(1.5-6/16+1.5, 13, i, animation, mariosizes[i], playertype, marioproperties[i])
 		end
 	end
 	
