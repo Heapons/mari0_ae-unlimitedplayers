@@ -10,7 +10,7 @@ You can play up to... however many players you want to play with! The game is no
 The only limit here is your <s>imagination</s> ***hardware***.
 
 > [!TIP]
-> Press **1** to quickly reset the player count to *1*.
+> Press **1** to quickly set to player count to one.
 
 ## Cheats
 ### Friendly-Fire

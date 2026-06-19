@@ -5156,7 +5156,9 @@ function mario:stompenemy(a, b)
 				end
 			end
 		else
-			b:stomp(self.x, self)
+			if b and b.stomp then
+				b:stomp(self.x, self)
+			end
 			if self.combo < #mariocombo then
 				addpoints(mariocombo[self.combo], self.x, self.y)
 				if a ~= "bulletbill" then
