@@ -26,6 +26,10 @@ function fireball:init(x, y, dir, v, t)
 					false, false, false, false, true,
 					false, true}
 					
+	if friendlyfire then
+		self.mask[3] = false
+	end
+	
 	self.destroy = false
 	self.destroysoon = false
 	self.t = t or "fireball"
@@ -258,6 +262,15 @@ function fireball:hitstuff(a, b, hitdir)
 		dir = "left"
 	end
 	if self.t == "iceball" then
+		if a == "player" then
+			if friendlyfire and b ~= self.fireballthrower then
+				if not (b.invincible or b.starred) then
+					b:die("Enemy (rightcollide)")
+				end
+				self:explode()
+			end
+			return
+		end
 		if a == "tile" or a == "portalwall" or a == "spring" or a == "kingbill" or a == "angrysun" or a == "springgreen" or a == "thwomp" or a == "fishbone" or a == "muncher" or (a == "bigkoopa" and b.t == "bigbeetle") or a == "meteor" or a == "parabeetle" or a == "boo" or a == "torpedoted" then
 			playsound(iciclesound)
 		elseif iceballfreeze[a] then
@@ -275,6 +288,14 @@ function fireball:hitstuff(a, b, hitdir)
 		self:explode()
 		playsound(blockhitsound)
 		
+	elseif a == "player" then
+		if friendlyfire and b ~= self.fireballthrower then
+			if not (b.invincible or b.starred) then
+				b:die("Enemy (rightcollide)")
+			end
+			self:explode()
+		end
+	
 	elseif a == "enemy" then
 		if b.reflectsfireballs then
 			if hitdir and (hitdir == "left" or hitdir == "right") then

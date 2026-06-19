@@ -252,6 +252,7 @@ function server_update(dt)
 			--send them the settings
 			server_infinitelives(infinitelives, clients[entity])
 			server_infinitetime(infinitetime, clients[entity])
+			server_friendlyfire(friendlyfire, clients[entity])
 			server_setmappack(mappack, clients[entity])
 			notice.new(playerlist[players].nick .. " connected", notice.white, 3)
 		elseif cmd == 'pong' and safe then
@@ -496,6 +497,11 @@ function client_update(dt)
 				if guielements.infinitetime then
 					guielements.infinitetime.var = infinitetime
 				end
+			elseif cmd == 'friendlyfire' then
+				friendlyfire = (t[2] == "true")
+				if guielements.friendlyfire then
+					guielements.friendlyfire.var = friendlyfire
+				end
 			elseif cmd == 'mappack' then
 				local target = t[2]
 				if mappack ~= t[2] and mappacklist then
@@ -538,6 +544,7 @@ function client_update(dt)
 				playercollisions = false
 				--infinitetime = false
 				--infinitelives = false
+				--friendlyfire = false
 				notice.new("cheats disabled", notice.white, 3)
 			elseif cmd == 'lobby' then
 				if gamestate ~= "lobby" then
@@ -702,6 +709,10 @@ function net_command(s)
 		infinitetime = not infinitetime
 		server_infinitetime(infinitetime, clients[entity])
 		notice.new("set infinite time to " .. tostring(infinitetime), notice.white, 3)
+	elseif s == "friendlyfire" then
+		friendlyfire = not friendlyfire
+		server_friendlyfire(friendlyfire, clients[entity])
+		notice.new("set friendly fire to " .. tostring(friendlyfire), notice.white, 3)
 	end
 end
 
@@ -891,6 +902,16 @@ function server_infinitetime(bool, t)
 		end
 	else
 		udp:sendto(string.format("%s~%s", 'infinitetime', tostring(bool) or true), t[1], t[2])
+	end
+end
+
+function server_friendlyfire(bool, t)
+	if not t then
+		for i, t in pairs(clients) do
+			udp:sendto(string.format("%s~%s", 'friendlyfire', tostring(bool) or true), t[1], t[2])
+		end
+	else
+		udp:sendto(string.format("%s~%s", 'friendlyfire', tostring(bool) or true), t[1], t[2])
 	end
 end
 

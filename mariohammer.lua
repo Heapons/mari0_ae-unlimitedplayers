@@ -26,6 +26,10 @@ function mariohammer:init(x, y, dir, v)
 					false, true, false, false, true,
 					false, true}
 					
+	if friendlyfire then
+		self.mask[3] = false
+	end
+	
 	self.destroy = false
 	self.destroysoon = false
 	
@@ -103,6 +107,14 @@ function mariohammer:passivecollide(a, b)
 end
 
 function mariohammer:hitstuff(a, b)
+	if a == "player" then
+		if friendlyfire and b ~= self.mariohammerthrower then
+			if not (b.invincible or b.starred) then
+				b:die("Enemy (rightcollide)")
+			end
+		end
+		return
+	end
 	if mariohammerkill[a] then
 		if a == "koopaling" and b.t == 9 and not (b.hittimer and b.hittimer > 0) then
 			addpoints(100, self.x, self.y)

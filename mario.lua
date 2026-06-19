@@ -66,6 +66,9 @@ function mario:init(x, y, i, animation, size, t, properties)
 	if playercollisions then
 		self.mask[3] = false
 	end
+	if friendlyfire then
+		self.mask[13] = false
+	end
 	if edgewrapping then
 		self.mask[10] = true
 	end
@@ -4465,6 +4468,17 @@ function mario:floorcollide(a, b)
 		return false
 	end
 	
+	if a == "player" then
+		if friendlyfire then
+			if self.starred or not (b.invincible or b.starred) then
+				b:die("Enemy (floorcollide)")
+			end
+			self:stompbounce(a, b)
+			return false
+		end
+		return
+	end
+
 	if a == "spring" then
 		if b.green then
 			self:hitspringgreen(b)
@@ -4977,6 +4991,12 @@ function mario:purplegel(dir)
 end
 
 function mario:stompenemy(a, b)
+	if a == "player" then
+		if friendlyfire then
+			b:die("Enemy (stompenemy)")
+		end
+		return
+	end
 	local bounce = false
 	if self.size ~= -1 or self.groundpounding or (a == "goomba" and b.t == "tinygoomba") then
 		if self.yoshi and (a == "koopa" or b.shellanimal) then
@@ -5301,6 +5321,17 @@ function mario:rightcollide(a, b, passive)
 	
 	if a == "mushroom" or a == "oneup" or a == "star" or a == "flower" or a == "poisonmush" or a == "threeup" or a == "smbsitem" or (a == "platform" and (b.dir == "right" or b.dir == "justright")) or a == "donut" or a == "hammersuit" or a == "frogsuit" or a == "leaf" or (a == "boomerang" and b.fireballthrower) then
 		return false
+	elseif a == "player" then
+		if friendlyfire then
+			if self.speedy > 2 then
+				if not (b.invincible or b.starred) then
+					b:die("Enemy (rightcollide)")
+				end
+				self:stompbounce(a, b)
+				return false
+			end
+		end
+		return
 	elseif a == "enemy" then
 		if b.ignoreleftcollide or b.dontstopmario then
 			return false
@@ -5688,6 +5719,17 @@ function mario:leftcollide(a, b)
 	
 	if a == "mushroom" or a == "oneup" or a == "star" or a == "flower" or a == "poisonmush" or a == "threeup" or a == "smbsitem" or (a == "platform" and (b.dir == "right" or b.dir == "justright")) or a == "donut" or a == "hammersuit" or a == "frogsuit" or a == "leaf" or (a == "boomerang" and b.fireballthrower) then --NOTHING
 		return false
+	elseif a == "player" then
+		if friendlyfire then
+			if self.speedy > 2 then
+				if not (b.invincible or b.starred) then
+					b:die("Enemy (leftcollide)")
+				end
+				self:stompbounce(a, b)
+				return false
+			end
+		end
+		return
 	elseif a == "enemy" then
 		if b.ignorerightcollide or b.dontstopmario then
 			return false
@@ -6022,6 +6064,14 @@ function mario:ceilcollide(a, b)
 	
 	if a == "mushroom" or a == "oneup" or a == "star" or a == "flower" or a == "poisonmush" or a == "threeup" or a == "smbsitem" or a == "hammersuit" or a == "frogsuit" or a == "leaf" or (a == "boomerang" and b.fireballthrower) then --STUFF THAT SHOULDN'T DO SHIT
 		return false
+	elseif a == "player" then
+		if self.speedy < 0 then
+			return
+		end
+		if friendlyfire then
+			return false
+		end
+		return
 	elseif a == "enemy" then
 		if b.ignorefloorcollide or b.dontstopmario then
 			return false
@@ -6420,7 +6470,9 @@ function mario:passivecollide(a, b)
 		end
 	end
 	
-	if a == "platform" or a == "seesawplatform" or a == "portalwall" or a == "donut" or a == "icicle" or a == "ice" then
+	if a == "player" then
+		return false
+	elseif a == "platform" or a == "seesawplatform" or a == "portalwall" or a == "donut" or a == "icicle" or a == "ice" then
 		return false
 	elseif a == "tilemoving" and b.speedy < 0 then
 		b:hit()
@@ -6559,6 +6611,11 @@ function mario:starcollide(a, b)
 	--enemies (and stuff) that don't do shit
 	elseif a == "upfire" or a == "fire" or a == "hammer" or a == "fireball" or a == "iceball" or a == "castlefirefire" or a == "brofireball" or a == "thwomp" or a == "skewer" or (a == "boomerang" and b.kills) or a == "mariohammer" or a == "bigmole" or a == "boomboom" or a == "amp" or a == "longfire" or a == "turretrocket" or a == "glados" or a == "wrench"  or a == "koopaling" then
 		return true
+	elseif a == "player" then
+		if friendlyfire then
+			b:die("Enemy (rightcollide)")
+			return true
+		end
 	elseif a == "muncher" or a == "plantcreepersegment" then
 		--nothing
 	end

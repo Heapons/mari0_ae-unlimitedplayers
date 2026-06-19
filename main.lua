@@ -3193,6 +3193,7 @@ function disablecheats()
 	infinitetime = false
 	infinitelives = false
 	darkmode = false
+	friendlyfire = false
 end
 
 function convertoldsuspendfile()

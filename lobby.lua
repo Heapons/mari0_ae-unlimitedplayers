@@ -17,6 +17,8 @@ function lobby_load()
 		function() if SERVER then infinitelives = not infinitelives; guielements.infinitelives.var = infinitelives; server_infinitelives(infinitelives) end end, infinitelives, "infinite lives")
 	guielements.infinitetime = guielement:new("checkbox", 7, 33,
 		function() if SERVER then infinitetime = not infinitetime; guielements.infinitetime.var = infinitetime; server_infinitetime(infinitetime) end end, infinitetime, "infinite time")
+	guielements.friendlyfire = guielement:new("checkbox", 7, 46,
+		function() if SERVER then friendlyfire = not friendlyfire; guielements.friendlyfire.var = friendlyfire; server_friendlyfire(friendlyfire) end end, friendlyfire, "friendly fire")
 	if not mappacklist then--load mappack list
 		loadmappacks()
 	end
@@ -98,6 +100,7 @@ function lobby_draw()
 	properprintF("settings", 9*scale, 9*scale)
 	guielements.infinitelives:draw()
 	guielements.infinitetime:draw()
+	guielements.friendlyfire:draw()
 	properprintF("mappack", 9*scale, 46*scale)
 	guielements.mappack:draw()
 	guielements.mappackleft:draw()

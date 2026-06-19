@@ -26,6 +26,10 @@ function mariotail:init(x, y, dir, v)
 					false, false, false, false, true,
 					false, true}
 					
+	if friendlyfire then
+		self.mask[3] = false
+	end
+	
 	self.destroy = false
 	self.destroysoon = false
 	self.playhitsound = true
@@ -82,6 +86,14 @@ function mariotail:passivecollide(a, b)
 end
 
 function mariotail:hitstuff(a, b)
+	if a == "player" then
+		if friendlyfire and b ~= self.player then
+			if not (b.invincible or b.starred) then
+				b:die("Enemy (rightcollide)")
+			end
+		end
+		return
+	end
 	if a == "tile" then
 		if self.playhitsound then
 			playsound(blockhitsound)

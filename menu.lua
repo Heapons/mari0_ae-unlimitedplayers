@@ -1645,6 +1645,19 @@ function menu_draw()
 			else
 				properprintF(TEXT["off"], (posX-utf8.len(TEXT["off"])*8)*scale, 200*scale)
 			end
+
+			if optionsselection == 12 then
+				love.graphics.setColor(255, 255, 255, 255)
+			else
+				love.graphics.setColor(100, 100, 100, 255)
+			end
+
+			properprintF(TEXT["friendly fire:"], 30*scale, 215*scale)
+			if friendlyfire then
+				properprintF(TEXT["on"], (posX-utf8.len(TEXT["on"])*8)*scale, 215*scale)
+			else
+				properprintF(TEXT["off"], (posX-utf8.len(TEXT["off"])*8)*scale, 215*scale)
+			end
 		end
 	end
 	love.graphics.translate(0, yoffset*scale)
@@ -2251,6 +2264,12 @@ function menu_keypressed(key, unicode)
 		elseif (key == "right" or key == "d") then
 			players = players + 1
 			ensureplayerdefaults(players)
+		elseif key == "1" then
+			players = 1
+			ensureplayerdefaults(players)
+		elseif key == "2" then
+			players = players * 2
+			ensureplayerdefaults(players)
 		end
 	elseif gamestate == "mappackmenu" then
 		if mappacksearchbar.inputting then
@@ -2473,7 +2492,7 @@ function menu_keypressed(key, unicode)
 						optionsselection = 1
 					end
 				else
-					if optionsselection < 11 then
+					if optionsselection < 12 then
 						optionsselection = optionsselection + 1
 					else
 						optionsselection = 1
@@ -2496,13 +2515,13 @@ function menu_keypressed(key, unicode)
 					optionsselection = 1
 				end
 			elseif optionstab == 3 then
-				if optionsselection < 11 then
+				if optionsselection < 12 then
 					optionsselection = optionsselection + 1
 				else
 					optionsselection = 1
 				end
 			elseif optionstab == 4 and gamefinished then
-				if optionsselection < 11 then
+				if optionsselection < 12 then
 					optionsselection = optionsselection + 1
 				else
 					optionsselection = 1
@@ -2667,6 +2686,8 @@ function menu_keypressed(key, unicode)
 					infinitelives = not infinitelives
 				elseif optionsselection == 11 then
 					darkmode = not darkmode
+				elseif optionsselection == 12 then
+					friendlyfire = not friendlyfire
 				end
 			end				
 		elseif (key == "left" or key == "a") then
@@ -2800,6 +2821,8 @@ function menu_keypressed(key, unicode)
 					infinitelives = not infinitelives
 				elseif optionsselection == 11 then
 					darkmode = not darkmode
+				elseif optionsselection == 12 then
+					friendlyfire = not friendlyfire
 				end
 			end
 		elseif key == "m" then
