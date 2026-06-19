@@ -1061,6 +1061,9 @@ function guielement:keypress(key,textinput)
 						
 						if found then
 							if key == "v" and self.ctrl then
+								if not textclipboard or #textclipboard == 0 then
+									textclipboard = love.system.getClipboardText() or ""
+								end
 								local highlightlength = 0
 								if self.highlight then
 									highlightlength = math.abs(self.highlight - self.cursorpos)
