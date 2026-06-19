@@ -233,7 +233,8 @@ function configdecrease()
 end
 
 function configincrease()
-	playerconfig = math.min(4, playerconfig+1)
+	playerconfig = playerconfig + 1
+	ensureplayerdefaults(playerconfig)
 end
 
 function togglemagic()

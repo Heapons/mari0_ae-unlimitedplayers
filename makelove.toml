@@ -1,4 +1,4 @@
-name = "mari0_ae"
+name = "mari0_ae-unlimitedplayers"
 default_targets = ["win32", "win64", "appimage", "macos"]
 build_directory = "makelove-build"
 icon_file = "graphics/icon.png"
@@ -11,10 +11,10 @@ love_files = [
 # TODO: more metadata
 
 [windows.exe_metadata]
-ProductName = "Mari0: AE"
+ProductName = "Mari0: AE (Unlimited Players)"
 
 [linux.desktop_file_metadata]
-Name = "Mari0: AE"
+Name = "Mari0: AE (Unlimited Players)"
 
 [macos.app_metadata]
-CFBundleDisplayName = "Mari0: AE"
+CFBundleDisplayName = "Mari0: AE (Unlimited Players)"

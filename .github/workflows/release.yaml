@@ -21,28 +21,28 @@ jobs:
         with:
           name: ${{ github.event.repository.name }}-linux
           path: ./artifacts
-      - run: mv ./artifacts/mari0_ae-linux ./artifacts/alesan99s_entities_${{ github.ref_name }}.AppImage
+      - run: mv ./artifacts/mari0_ae-unlimitedplayers-linux ./artifacts/alesan99s_entities_${{ github.ref_name }}.AppImage
 
       - name: Download and Rename macOS Artifact
         uses: actions/download-artifact@v4
         with:
           name: ${{ github.event.repository.name }}-macos
           path: ./artifacts
-      - run: mv ./artifacts/mari0_ae-macos ./artifacts/alesan99s_entities_${{ github.ref_name }}-macos.zip
+      - run: mv ./artifacts/mari0_ae-unlimitedplayers-macos ./artifacts/alesan99s_entities_${{ github.ref_name }}-macos.zip
 
       - name: Download and Rename Windows 64-bit Artifact
         uses: actions/download-artifact@v4
         with:
           name: ${{ github.event.repository.name }}-win64
           path: ./artifacts
-      - run: mv ./artifacts/mari0_ae-win64 ./artifacts/alesan99s_entities_${{ github.ref_name }}-win64.zip
+      - run: mv ./artifacts/mari0_ae-unlimitedplayers-win64 ./artifacts/alesan99s_entities_${{ github.ref_name }}-win64.zip
 
       - name: Download and Rename Windows 32-bit Artifact
         uses: actions/download-artifact@v4
         with:
           name: ${{ github.event.repository.name }}-win32
           path: ./artifacts
-      - run: mv ./artifacts/mari0_ae-win32 ./artifacts/alesan99s_entities_${{ github.ref_name }}-win32.zip
+      - run: mv ./artifacts/mari0_ae-unlimitedplayers-win32 ./artifacts/alesan99s_entities_${{ github.ref_name }}-win32.zip
 
       - name: Download and Rename Android Release APK
         uses: actions/download-artifact@v4

@@ -2,7 +2,6 @@ local languagemenuopen = false
 local menu_updatemouseselection
 function menu_load()
 	love.audio.stop()
-	pausedaudio = nil
 	editormode = false
 	guielements = {}
 	gamestate = "menu"
@@ -42,6 +41,7 @@ function menu_load()
 	mariocoincount = 0
 	objects = nil
 	updateplayerproperties("reset")
+	ensureplayerdefaults(players)
 	love.graphics.setBackgroundColor(backgroundcolor[1])
 	
 	
@@ -447,7 +447,7 @@ function menu_draw()
 		end
 	end]]
 	
-	for j = 1, math.min(4, players) do
+	for j = 1, players do
 		local char = mariocharacter[j]
 		local v = characters.data[char]
 		if (not v) or (not v["animations"]) then
@@ -512,7 +512,7 @@ function menu_draw()
 		love.graphics.draw(titleimage, titlequad[titleframe], x*scale, 24*scale, 0, scale, scale)
 		
 		love.graphics.setColor(255, 255, 255)
-		properprintF("©2012-2024 maurice", (x+titlewidth-144)*scale, 112*scale)
+		properprintF("©2012-2026 maurice", (x+titlewidth-144)*scale, 112*scale)
 		love.graphics.setColor(255, 255, 255, 255)
 		
 		if selection == 0 then
@@ -579,10 +579,10 @@ function menu_draw()
 			--if not (not disabletips and menutipoffset > -width*16) then
 				if not (custombackground or customforeground) or hudoutline then
 					love.graphics.setColor(0, 0, 0)
-					properprint("mod by alesan99", (width*16-#("mod by alesan99")*8-7)*scale, 209*scale) --a little less intrusive
+					properprint("mod by alesan99, heapons", (width*16-#("mod by alesan99, heapons")*8-7)*scale, 209*scale) --a little less intrusive
 					love.graphics.setColor(255, 255, 255)
 				end
-				properprint("mod by alesan99", (width*16-#("mod by alesan99")*8-8)*scale, 208*scale) --a little less intrusive
+				properprint("mod by alesan99, heapons", (width*16-#("mod by alesan99, heapons")*8-8)*scale, 208*scale) --a little less intrusive
 			--end
 			
 			love.graphics.translate(-tx, -ty)
@@ -592,9 +592,7 @@ function menu_draw()
 			love.graphics.draw(playerselectarrowimg, (138-(math.ceil((utf8.len(TEXT["player game"])+2)/2)*8))*scale, 138*scale, 0, scale, scale)
 		end
 		
-		if players < 4 then
-			love.graphics.draw(playerselectarrowimg, (158-(math.ceil((utf8.len(TEXT["player game"])+2)/2)*8))*scale, 138*scale, 0, -scale, scale)
-		end
+		love.graphics.draw(playerselectarrowimg, (158-(math.ceil((utf8.len(TEXT["player game"])+2)/2)*8))*scale, 138*scale, 0, -scale, scale)
 		
 		if newgamewarning then
 			love.graphics.setColor(0, 0, 0)
@@ -2252,9 +2250,7 @@ function menu_keypressed(key, unicode)
 			end
 		elseif (key == "right" or key == "d") then
 			players = players + 1
-			if players > 4 then
-				players = 4
-			end
+			ensureplayerdefaults(players)
 		end
 	elseif gamestate == "mappackmenu" then
 		if mappacksearchbar.inputting then
@@ -2432,12 +2428,10 @@ function menu_keypressed(key, unicode)
 				end
 			elseif (key == "right" or key == "d") then
 				if optionstab == 2 or optionstab == 1 then
-					if skinningplayer < 4 then
+					if skinningplayer < players then
 						skinningplayer = skinningplayer + 1
 						characteri = characters.data[mariocharacter[skinningplayer]].i
-						if players > #controls then
-							loadconfig()
-						end
+						ensureplayerdefaults(players)
 					end
 				end
 			end

@@ -258,6 +258,8 @@ function love.load()
 	else
 		love.filesystem.setIdentity("mari0")
 	end
+
+	--gamefinished = true
 	
 	local ok, result = pcall(loadconfig)
 	if not ok then
@@ -1376,7 +1378,7 @@ function saveconfig()
 	
 	if mariocharacter then
 		s = s .. "mariocharacter:"
-		for i = 1, 4 do
+		for i = 1, math.max(#mariocharacter, players) do
 			if mariocharacter[i] then
 				s = s .. mariocharacter[i] .. ","
 			else
@@ -1637,14 +1639,84 @@ function loadconfig(nodefaultconfig)
 		end
 	end
 	
-	for i = 1, math.max(4, players) do
+	ensureplayerdefaults(players)
+	for i = 1, players do
 		if not portalhues[i] then
 			break
 		else
 			portalcolor[i] = {getrainbowcolor(portalhues[i][1]), getrainbowcolor(portalhues[i][2])}
 		end
 	end
-	players = 1
+end
+
+function ensureplayerdefaults(targetplayers)
+	targetplayers = math.max(1, targetplayers or players or 1)
+
+	if not controls then controls = {} end
+	if not portalhues then portalhues = {} end
+	if not portalcolor then portalcolor = {} end
+	if not mariohats then mariohats = {} end
+	if not mariocolors then mariocolors = {} end
+	if not mariocharacter then mariocharacter = {} end
+
+	local defaultcolors = {
+		{{225,  32,   0}, {136, 112,   0}, {252, 152,  56}},
+		{{255, 255, 255}, {  0, 160,   0}, {252, 152,  56}},
+		{{  0,   0,   0}, {200,  76,  12}, {252, 188, 176}},
+		{{ 32,  56, 236}, {  0, 128, 136}, {252, 152,  56}}
+	}
+
+	for i = 1, targetplayers do
+		if not controls[i] then
+			controls[i] = {}
+		end
+
+		if i == 1 then
+			controls[i]["right"] = controls[i]["right"] or {"d"}
+			controls[i]["left"] = controls[i]["left"] or {"a"}
+			controls[i]["down"] = controls[i]["down"] or {"s"}
+			controls[i]["up"] = controls[i]["up"] or {"w"}
+			controls[i]["run"] = controls[i]["run"] or {"lshift"}
+			controls[i]["jump"] = controls[i]["jump"] or {" "}
+			controls[i]["aimx"] = controls[i]["aimx"] or {""}
+			controls[i]["aimy"] = controls[i]["aimy"] or {""}
+			controls[i]["portal1"] = controls[i]["portal1"] or {""}
+			controls[i]["portal2"] = controls[i]["portal2"] or {""}
+			controls[i]["reload"] = controls[i]["reload"] or {"r"}
+			controls[i]["use"] = controls[i]["use"] or {"e"}
+			controls[i]["pause"] = controls[i]["pause"] or {""}
+		else
+			controls[i]["right"] = controls[i]["right"] or {"joy", i-1, "hat", 1, "r"}
+			controls[i]["left"] = controls[i]["left"] or {"joy", i-1, "hat", 1, "l"}
+			controls[i]["down"] = controls[i]["down"] or {"joy", i-1, "hat", 1, "d"}
+			controls[i]["up"] = controls[i]["up"] or {"joy", i-1, "hat", 1, "u"}
+			controls[i]["run"] = controls[i]["run"] or {"joy", i-1, "but", 3}
+			controls[i]["jump"] = controls[i]["jump"] or {"joy", i-1, "but", 1}
+			controls[i]["aimx"] = controls[i]["aimx"] or {"joy", i-1, "axe", 5, "neg"}
+			controls[i]["aimy"] = controls[i]["aimy"] or {"joy", i-1, "axe", 4, "neg"}
+			controls[i]["portal1"] = controls[i]["portal1"] or {"joy", i-1, "but", 5}
+			controls[i]["portal2"] = controls[i]["portal2"] or {"joy", i-1, "but", 6}
+			controls[i]["reload"] = controls[i]["reload"] or {"joy", i-1, "but", 4}
+			controls[i]["use"] = controls[i]["use"] or {"joy", i-1, "but", 2}
+			controls[i]["pause"] = controls[i]["pause"] or {""}
+		end
+
+		if not portalhues[i] then
+			portalhues[i] = {((i - 1) / targetplayers), ((i - 1) / targetplayers) + 0.5 / targetplayers}
+		end
+		if not portalcolor[i] then
+			portalcolor[i] = {getrainbowcolor(portalhues[i][1]), getrainbowcolor(portalhues[i][2])}
+		end
+		if not mariohats[i] then
+			mariohats[i] = {1}
+		end
+		if not mariocolors[i] then
+			mariocolors[i] = deepcopy(defaultcolors[((i - 1) % #defaultcolors) + 1])
+		end
+		if not mariocharacter[i] then
+			mariocharacter[i] = "mario"
+		end
+	end
 end
 
 
@@ -2606,7 +2678,7 @@ end
 function love.focus(f)
 	if (not f) and gamestate == "game"and (not editormode) and (not testlevel) and (not levelfinished) and (not everyonedead) and (not CLIENT) and (not SERVER) and (not dontPauseOnUnfocus) then
 		pausemenuopen = true
-		pausedaudio = pausedaudio or love.audio.pause()
+		pausedaudio = love.audio.pause()
 	end
 end
 

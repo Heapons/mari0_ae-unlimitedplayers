@@ -15,6 +15,7 @@ function game_load(suspended, deletesuspend)
 	scrollingleftstart = scrollingleftstartv --See above, but for scrolling left, and it takes the player on the right-estest.
 	scrollingleftcomplete = scrollingleftcompletev
 	superscroll = 100
+	ensureplayerdefaults(players)
 
 	if nofunallowed then
 		disablecheats()
@@ -3950,7 +3951,6 @@ function startlevel(level, reason)
 	else
 		love.audio.stop()
 	end
-	pausedaudio = nil
 	animationsystem_load()
 
 	local sublevel = false
