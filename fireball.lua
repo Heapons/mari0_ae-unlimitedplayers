@@ -263,11 +263,14 @@ function fireball:hitstuff(a, b, hitdir)
 	end
 	if self.t == "iceball" then
 		if a == "player" then
+			if not self.active then return end
 			if friendlyfire and b ~= self.fireballthrower then
-				if not (b.invincible or b.starred) then
-					b:die("Enemy (rightcollide)")
+				if b.freezable and (not b.frozen) and (not b.resistseverything) and not (b.invincible or b.starred) then
+					self:explode()
+					table.insert(objects["ice"], ice:new(b.x+b.width/2, b.y+b.height, b.width, b.height, a, b))
+				else
+					self:explode()
 				end
-				self:explode()
 			end
 			return
 		end

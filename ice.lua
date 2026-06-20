@@ -29,10 +29,11 @@ function ice:init(x, y, w, h, a, enemy)
 	self.oldenemyactive = self.enemy.active
 	self.oldenemyresistsyoshitounge = self.enemy.resistsyoshitounge
 	self.oldenemycustomscissor = self.enemy.customscissor
+	enemy.iceblock = self
 	if self.enemy.freeze then
 		self.enemy:freeze()
 	end
-	if enemy.static or math.abs(enemy.speedy) > 2 or (enemy.gravity and enemy.gravity == 0) then
+	if self.oldenemystatic or math.abs(enemy.speedy) > 2 or (enemy.gravity and enemy.gravity == 0) then
 		self.static = true
 		self.activestatic = true
 		self.y = enemy.y+enemy.height/2-self.height/2
@@ -41,7 +42,6 @@ function ice:init(x, y, w, h, a, enemy)
 	if enemy.dontfallafterfreeze then
 		self.oldenemytrackspeed = enemy.trackspeed
 	end
-	enemy.iceblock = self
 	self.falling = false
 	self:hold()
 end
@@ -301,7 +301,9 @@ function ice:meltice(destroy)
 		
 		local b = self.enemy
 		b.frozen = true
-		if mariohammerkill[self.a] then
+		if self.a == "player" then
+			b:die("Enemy (iceblock)")
+		elseif mariohammerkill[self.a] then
 			b:shotted("right")
 			if a ~= "bowser" then
 				addpoints(firepoints[a], self.x, self.y)

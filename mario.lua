@@ -246,6 +246,7 @@ function mario:init(x, y, i, animation, size, t, properties)
 	self.passivemoved = false
 	self.ducking = false
 	self.invincible = false
+	self.freezable = true
 	self.rainboomallowed = true
 	self.water = underwater
 	self.yoshi = false
@@ -8998,7 +8999,9 @@ function mario:freeze() --ice ball
 	if not self.frozen then
 		self.static = true
 		self.jumping = false
-		self.groundfreeze = icefreezetime
+		if not self.iceblock then
+			self.groundfreeze = icefreezetime
+		end
 		self.frozen = true
 		self.speedx = 0
 		self.animationstate = "idle"

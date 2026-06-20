@@ -867,7 +867,7 @@ function game_update(dt)
 			--scrolling
 			--LEFT
 			local i = 1
-			while i <= players and objects["player"][i].dead do
+			while i <= players and objects["player"][i] and objects["player"][i].dead do
 				i = i + 1
 			end
 			local fastestplayer = objects["player"][i]
@@ -876,7 +876,7 @@ function game_update(dt)
 			if fastestplayer then
 				if not CLIENT and not SERVER then
 					for i = 1, players do
-						if not objects["player"][i].dead and objects["player"][i].x > fastestplayer.x then
+						if objects["player"][i] and not objects["player"][i].dead and objects["player"][i].x > fastestplayer.x then
 							fastestplayer = objects["player"][i]
 						end
 					end
@@ -971,19 +971,19 @@ function game_update(dt)
 	if autoscroll and autoscrolly ~= false and not minimapdragging then
 		for split = 1, #splitscreen do
 			local fastestplayer = 1
-			while fastestplayer <= players and objects["player"][fastestplayer].dead do
+			while fastestplayer <= players and objects["player"][fastestplayer] and objects["player"][fastestplayer].dead do
 				fastestplayer = fastestplayer + 1
 			end
 			if not CLIENT and not SERVER and objects["player"][fastestplayer] then
 				if mapwidth <= width then
 					for i = 1, players do
-						if not objects["player"][i].dead and math.abs(starty-objects["player"][i].y) > math.abs(starty-objects["player"][fastestplayer].y) then
+						if objects["player"][i] and not objects["player"][i].dead and math.abs(starty-objects["player"][i].y) > math.abs(starty-objects["player"][fastestplayer].y) then
 							fastestplayer = i
 						end
 					end
 				else
 					for i = 1, players do
-						if not objects["player"][i].dead and objects["player"][i].x > objects["player"][fastestplayer].x then
+						if objects["player"][i] and not objects["player"][i].dead and objects["player"][i].x > objects["player"][fastestplayer].x then
 							fastestplayer = i
 						end
 					end
@@ -3683,7 +3683,7 @@ function drawplayer(i, x, y, r, pad, drop)
 	end
 
 	--ice block
-	if v.frozen then
+	if v.frozen and not v.iceblock then
 		love.graphics.setColor(255,255,255, a)
 		local w, h = math.ceil(v.width)*2+1, math.ceil(v.height)*2+1
 		for x = 1, w do
