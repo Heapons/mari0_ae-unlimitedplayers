@@ -1061,8 +1061,11 @@ function guielement:keypress(key,textinput)
 						
 						if found then
 							if key == "v" and self.ctrl then
-								if not textclipboard or #textclipboard == 0 then
-									textclipboard = love.system.getClipboardText() or ""
+								local osclip = love.system.getClipboardText()
+								if osclip and #osclip > 0 then
+									textclipboard = osclip
+								elseif not textclipboard or #textclipboard == 0 then
+									textclipboard = osclip or ""
 								end
 								local highlightlength = 0
 								if self.highlight then
@@ -1097,6 +1100,10 @@ function guielement:keypress(key,textinput)
 							--end
 							self.cursorblink = true
 							self.timer = 0
+						end
+						
+						if key == "v" and self.ctrl and self.pastefunc then
+							self:pastefunc()
 						end
 					elseif key == "v" and self.ctrl and textclipboard and #textclipboard > 0 then
 						notice.new("no room to paste!")

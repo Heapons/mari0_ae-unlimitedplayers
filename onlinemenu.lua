@@ -19,6 +19,18 @@ function onlinemenu_load()
 	
 	
 	guielements.ipentry = guielement:new("input", 6, 87, 23, joingame, "", 23, 1)
+	guielements.ipentry.pastefunc = function()
+		local s = guielements.ipentry.value
+		local colonpos = s:find(":")
+		if colonpos then
+			local ip = s:sub(1, colonpos-1)
+			local port = s:sub(colonpos+1)
+			guielements.ipentry.value = ip
+			guielements.portentry2.value = port
+			guielements.ipentry.cursorpos = #ip + 1
+		end
+	end
+	
 	guielements.portentry2 = guielement:new("input", 131, 145, 5, nil, "27020", 5, 1, true)
 	
 	guielements.portentry = guielement:new("input", 274, 87, 5, function() notice.new(TEXT["port notice"], notice.red, 12) end, "27020", 5, 1, true)

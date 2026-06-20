@@ -30,14 +30,12 @@ function client_load(a, p)
 	udp = socket.udp()
 	udp:settimeout(0)
  
-	udp:setpeername(address, port)
-	if tostring(udp) and not (tostring(udp):sub(1, 14) == "udp{connected}") then
+	local ok, err = udp:setpeername(address, port)
+	if not ok then
 		udp:close()
-		notice.new("server not found", notice.red, 3)
+		notice.new("server not found: " .. tostring(err), notice.red, 3)
 		return false
 	end
- 
-	math.randomseed(os.time()) 
  
 	entity = tostring(math.random(99999))
 	clients = {}
@@ -72,8 +70,12 @@ function server_load(p)
 	entity = nil
 	clients = {}
 	
-	udp:setsockname("*", port)
+	local ok, err = udp:setsockname("*", port)
 	udp:settimeout(0)
+	if not ok then
+		notice.new("could not host: " .. tostring(err), notice.red, 3)
+		return false
+	end
 	
 	local success, ip = pcall(function() return socket.dns.toip(socket.dns.gethostname()) end)
 	if success and ip then
@@ -189,7 +191,7 @@ function server_update(dt)
 		
 		--commands
 		if cmd == 'connect' then
-			if entity and not clients[entity] then
+			if entity then
 				clients[entity] = {msg_or_ip, port_or_nil}
 			end
 			if gamestate ~= "lobby" then
