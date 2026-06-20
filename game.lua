@@ -356,6 +356,10 @@ function game_update(dt)
 				end
 			end
 		end
+		
+		if infinitetime then
+			mariotime = 0
+		end
 	end
 
 	--Portaldots
@@ -3763,10 +3767,12 @@ function drawHUD()
 		properprintfunc(addzeros((marioscore or 0), 9), (width*16-56-(9*8))*scale, 12*scale)
 		
 		love.graphics.draw(hudclockimg, hudclockquad[hudoutline], (width*16-49)*scale, 11*scale, 0, scale, scale)
-		if gamestate == "game" then
-			properprintfunc(addzeros(math.ceil(mariotime), 3), (width*16-40)*scale, 12*scale)
-		else
-			properprintfunc("000", (width*16-40)*scale, 12*scale)
+		if not infinitetime then
+			if gamestate == "game" then
+				properprintfunc(addzeros(math.ceil(mariotime), 3), (width*16-40)*scale, 12*scale)
+			else
+				properprintfunc("000", (width*16-40)*scale, 12*scale)
+			end
 		end
 	else
 		properprintfunc(playername, uispace*.5 - 24*scale, 8*scale)
@@ -3787,14 +3793,16 @@ function drawHUD()
 		properprintfunc((world or 1) .. "-" .. (mariolevel or 1), uispace*2.5 - 12*scale, 16*scale)
 		
 		properprintfunc(TEXT["time"], uispace*3.5 - 16*scale, 8*scale)
-		if editormode then
-			if editorstate == "linktool" then
-				properprintfunc(TEXT["link"], uispace*3.5 - 16*scale, 16*scale)
-			else
-				properprintfunc(TEXT["edit"], uispace*3.5 - 16*scale, 16*scale)
+		if not infinitetime then
+			if editormode then
+				if editorstate == "linktool" then
+					properprintfunc(TEXT["link"], uispace*3.5 - 16*scale, 16*scale)
+				else
+					properprintfunc(TEXT["edit"], uispace*3.5 - 16*scale, 16*scale)
+				end
+			elseif gamestate == "game" then
+				properprintfunc(addzeros(math.ceil(mariotime), 3), uispace*3.5-8*scale, 16*scale)
 			end
-		elseif gamestate == "game" then
-			properprintfunc(addzeros(math.ceil(mariotime), 3), uispace*3.5-8*scale, 16*scale)
 		end
 	end
 
@@ -3851,7 +3859,7 @@ function drawmultiHUD()
 		properprintfunc = properprintFbackground
 	end
 	
-	local livesdisplay = (mariolivecount ~= false)
+	local livesdisplay = (mariolivecount ~= false and not infinitelives)
 	if (not livesdisplay) and objects and objects["player"] then
 		--should the lives counter be displayed?
 		for i = 1, players do
@@ -3867,7 +3875,7 @@ function drawmultiHUD()
 		for i = 1, players do
 			--lives
 			local s
-			if (mariolivecount ~= false) then
+			if (mariolivecount ~= false) and not infinitelives then
 				s = "p" .. i .. " * " .. mariolives[i]
 			else
 				s = "p" .. i
