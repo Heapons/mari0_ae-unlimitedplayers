@@ -147,8 +147,8 @@ function server_update(dt)
 				end
 				s = s:sub(1, -2)
 				--for i, t in pairs(clients) do
-					playerlist[1].actions = s
-					--udp:sendto(string.format("%s~%s~%s", 'action', playerlist[1].id, s), t[1], t[2])
+				playerlist[1].actions = s
+				--udp:sendto(string.format("%s~%s~%s", 'action', playerlist[1].id, s), t[1], t[2])
 				--end
 				actions = {}
 			end
@@ -170,8 +170,8 @@ function server_update(dt)
 							if speedx == math.floor(speedx) then ft[1] = "d" end; if speedy == math.floor(speedy) then ft[2] = "d" end
 						
 							if (objects["player"][i].speedx ~= 0 or objects["player"][i].speedy ~= 0) or
-							 ((not objects["player"][i].oldx) or (objects["player"][i].oldx ~= objects["player"][i].x)) or
-							 ((not objects["player"][i].oldy) or (objects["player"][i].oldy ~= objects["player"][i].y)) then
+							((not objects["player"][i].oldx) or (objects["player"][i].oldx ~= objects["player"][i].x)) or
+							((not objects["player"][i].oldy) or (objects["player"][i].oldy ~= objects["player"][i].y)) then
 								local dg = string.format("%s~%s~%s~%s~%s~%s~%d~%s~%s", 'move', playerlist[i].id, x, y, speedx, speedy, gravity, animationstate, pointingangle)
 								udp:sendto(dg, clients[entity][1], clients[entity][2])
 							end
@@ -179,9 +179,9 @@ function server_update(dt)
 						end
 					end
 				end
-				for i = 1, players do
-					playerlist[i].actions = false
-				end
+			end
+			for i = 1, players do
+				playerlist[i].actions = false
 			end
 			updatetimer = updatetimer - updaterate
 		end
@@ -268,6 +268,16 @@ function server_update(dt)
 			server_infinitelives(infinitelives, clients[entity])
 			server_infinitetime(infinitetime, clients[entity])
 			server_friendlyfire(friendlyfire, clients[entity])
+			server_playertype(playertype, clients[entity])
+			server_playertypei(playertypei, clients[entity])
+			server_bullettime(bullettime, clients[entity])
+			server_speedtarget(speedtarget, clients[entity])
+			server_portalknockback(portalknockback, clients[entity])
+			server_bigmario(bigmario, clients[entity])
+			server_goombaattack(goombaattack, clients[entity])
+			server_sonicrainboom(sonicrainboom, clients[entity])
+			server_playercollisions(playercollisions, clients[entity])
+			server_darkmode(darkmode, clients[entity])
 			server_setmappack(mappack, clients[entity])
 			notice.new(playerlist[players].nick .. " connected", notice.white, 3)
 		elseif cmd == 'pong' and safe then
@@ -502,6 +512,14 @@ function client_update(dt)
 						net_doaction(objects["player"][id], s)
 					end
 				end
+			elseif cmd == "player_stomp" then
+				local victim_id = tonumber(t[2]) 
+				if victim_id and objects["player"] then
+					local victim = objects["player"][victim_id]
+					if victim then
+						victim:die("Enemy (floorcollide)") 
+					end
+				end
 			elseif cmd == 'infinitelives' then
 				infinitelives = (t[2] == "true")
 				if guielements.infinitelives then
@@ -517,6 +535,26 @@ function client_update(dt)
 				if guielements.friendlyfire then
 					guielements.friendlyfire.var = friendlyfire
 				end
+			elseif cmd == 'playertype' then
+				playertype = t[2]
+			elseif cmd == 'playertypei' then
+				playertypei = tonumber(t[2])
+			elseif cmd == 'bullettime' then
+				bullettime = (t[2] == "true")
+			elseif cmd == 'speedtarget' then
+				speedtarget = tonumber(t[2])
+			elseif cmd == 'portalknockback' then
+				portalknockback = (t[2] == "true")
+			elseif cmd == 'bigmario' then
+				bigmario = (t[2] == "true")
+			elseif cmd == 'goombaattack' then
+				goombaattack = (t[2] == "true")
+			elseif cmd == 'sonicrainboom' then
+				sonicrainboom = (t[2] == "true")
+			elseif cmd == 'playercollisions' then
+				playercollisions = (t[2] == "true")
+			elseif cmd == 'darkmode' then
+				darkmode = (t[2] == "true")
 			elseif cmd == 'mappack' then
 				local target = t[2]
 				if mappack ~= t[2] and mappacklist then
@@ -764,7 +802,7 @@ function server_disconnect(removei)
 		s = s .. playerlist[i].id .. ";" .. tostring(playerlist[i].nick) .. ";" .. c .. ";" .. tostring(playerlist[i].hats[1]) .. ";" .. tostring(playerlist[i].character) .. "~"
 	end
 	s = s:sub(1, -2)
-
+	
 	local delete = {}
 	for i, t in pairs(clients) do
 		if t.i then
@@ -906,30 +944,130 @@ end
 function server_infinitelives(bool, t) --true?, client
 	if not t then
 		for i, t in pairs(clients) do
-			udp:sendto(string.format("%s~%s", 'infinitelives', tostring(bool) or true), t[1], t[2])
+			udp:sendto(string.format("%s~%s", 'infinitelives', tostring(bool)), t[1], t[2])
 		end
 	else
-		udp:sendto(string.format("%s~%s", 'infinitelives', tostring(bool) or true), t[1], t[2])
+		udp:sendto(string.format("%s~%s", 'infinitelives', tostring(bool)), t[1], t[2])
+	end
+end
+
+function server_playertype(val, t)
+	if not t then
+		for i, t in pairs(clients) do
+			udp:sendto(string.format("%s~%s", 'playertype', tostring(val)), t[1], t[2])
+		end
+	else
+		udp:sendto(string.format("%s~%s", 'playertype', tostring(val)), t[1], t[2])
+	end
+end
+
+function server_playertypei(int, t)
+	if not t then
+		for i, t in pairs(clients) do
+			udp:sendto(string.format("%s~%s", 'playertypei', tostring(int)), t[1], t[2])
+		end
+	else
+		udp:sendto(string.format("%s~%s", 'playertypei', tostring(int)), t[1], t[2])
+	end
+end
+
+function server_bullettime(bool, t)
+	if not t then
+		for i, t in pairs(clients) do
+			udp:sendto(string.format("%s~%s", 'bullettime', tostring(bool)), t[1], t[2])
+		end
+	else
+		udp:sendto(string.format("%s~%s", 'bullettime', tostring(bool)), t[1], t[2])
+	end
+end
+
+function server_speedtarget(int, t)
+	if not t then
+		for i, t in pairs(clients) do
+			udp:sendto(string.format("%s~%s", 'speedtarget', tostring(int)), t[1], t[2])
+		end
+	else
+		udp:sendto(string.format("%s~%s", 'speedtarget', tostring(int)), t[1], t[2])
+	end
+end
+
+function server_portalknockback(bool, t)
+	if not t then
+		for i, t in pairs(clients) do
+			udp:sendto(string.format("%s~%s", 'portalknockback', tostring(portalknockback) or false), t[1], t[2])
+		end
+	else
+		udp:sendto(string.format("%s~%s", 'portalknockback', tostring(portalknockback) or false), t[1], t[2])
+	end
+end
+
+function server_bigmario(bool, t)
+	if not t then
+		for i, t in pairs(clients) do
+			udp:sendto(string.format("%s~%s", 'bigmario', tostring(bigmario)), t[1], t[2])
+		end
+	else
+		udp:sendto(string.format("%s~%s", 'bigmario', tostring(bigmario)), t[1], t[2])
+	end
+end
+
+function server_goombaattack(bool, t)
+	if not t then
+		for i, t in pairs(clients) do
+			udp:sendto(string.format("%s~%s", 'goombaattack', tostring(goombaattack)), t[1], t[2])
+		end
+	else
+		udp:sendto(string.format("%s~%s", 'goombaattack', tostring(goombaattack)), t[1], t[2])
+	end
+end
+
+function server_sonicrainboom(bool, t)
+	if not t then
+		for i, t in pairs(clients) do
+			udp:sendto(string.format("%s~%s", 'sonicrainboom', tostring(sonicrainboom)), t[1], t[2])
+		end
+	else
+		udp:sendto(string.format("%s~%s", 'sonicrainboom', tostring(sonicrainboom)), t[1], t[2])
+	end
+end
+
+function server_playercollisions(bool, t)
+	if not t then
+		for i, t in pairs(clients) do
+			udp:sendto(string.format("%s~%s", 'playercollisions', tostring(playercollisions)), t[1], t[2])
+		end
+	else
+		udp:sendto(string.format("%s~%s", 'playercollisions', tostring(playercollisions)), t[1], t[2])
+	end
+end
+
+function server_darkmode(bool, t)
+	if not t then
+		for i, t in pairs(clients) do
+			udp:sendto(string.format("%s~%s", 'darkmode', tostring(darkmode)), t[1], t[2])
+		end
+	else
+		udp:sendto(string.format("%s~%s", 'darkmode', tostring(darkmode)), t[1], t[2])
 	end
 end
 
 function server_infinitetime(bool, t)
 	if not t then
 		for i, t in pairs(clients) do
-			udp:sendto(string.format("%s~%s", 'infinitetime', tostring(bool) or true), t[1], t[2])
+			udp:sendto(string.format("%s~%s", 'infinitetime', tostring(bool)), t[1], t[2])
 		end
 	else
-		udp:sendto(string.format("%s~%s", 'infinitetime', tostring(bool) or true), t[1], t[2])
+		udp:sendto(string.format("%s~%s", 'infinitetime', tostring(bool)), t[1], t[2])
 	end
 end
 
 function server_friendlyfire(bool, t)
 	if not t then
 		for i, t in pairs(clients) do
-			udp:sendto(string.format("%s~%s", 'friendlyfire', tostring(bool) or true), t[1], t[2])
+			udp:sendto(string.format("%s~%s", 'friendlyfire', tostring(bool)), t[1], t[2])
 		end
 	else
-		udp:sendto(string.format("%s~%s", 'friendlyfire', tostring(bool) or true), t[1], t[2])
+		udp:sendto(string.format("%s~%s", 'friendlyfire', tostring(bool)), t[1], t[2])
 	end
 end
 

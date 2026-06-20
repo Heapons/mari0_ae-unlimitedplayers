@@ -5169,7 +5169,7 @@ function game_keypressed(key, textinput)
 	
 	--chat
 	if (SERVER or CLIENT) then
-		if key == "/" or (chatentrytoggle and key == "escape") then
+		if key == "/" or key == "=" or (chatentrytoggle and key == "escape") then
 			chatentrytoggle = not chatentrytoggle
 			if key == "escape" then
 				chatentrytoggle = false

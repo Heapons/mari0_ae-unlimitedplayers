@@ -2700,6 +2700,19 @@ function mario:update(dt)
 	end
 	
 	self:setquad()
+
+    if playercollisions and self.playernumber == playernumber then
+        for i, v in pairs(objects["mario"]) do
+            if v ~= self and not v.dead then
+                if self.speedy > 0 and (self.y + self.height) >= v.y and (self.y + self.height) <= v.y + 4 and self.x + self.width > v.x and self.x < v.x + v.width then
+                    self.speedy = -14 
+                    if client then
+                        client:send("player_stomp", {attacker = self.playernumber, victim = v.playernumber})
+                    end
+                end
+            end
+        end
+    end
 end
 
 function mario:updateangle()
