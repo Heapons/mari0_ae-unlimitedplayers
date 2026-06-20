@@ -262,11 +262,38 @@ function levelscreen_draw()
 			elseif world == "M" then
 				world = " "
 			end
-			properprintfunc("world " .. world .. "-" .. mariolevel, (width/2*16)*scale-40*scale, 72*scale - (players-1)*6*scale)
+
+			-- grid layout
+			local spacing_x = 55
+			local spacing_y = 20
+			local cols = math.max(1, math.ceil(math.sqrt(players)))
+			local rows = math.ceil(players / cols)
 			
+			properprintfunc("world " .. world .. "-" .. mariolevel, (width/2*16)*scale-40*scale, 64*scale)
+			
+			local margin_x = 10
+			local margin_y_top = 88
+			local margin_y_bottom = 25
+			local avail_w = (width*16 - margin_x*2) * scale
+			local avail_h = (height*16 - margin_y_top - margin_y_bottom) * scale
+			local grid_w = cols * spacing_x * scale
+			local grid_h = rows * spacing_y * scale
+			local fit_scale = math.min(1, avail_w / math.max(1, grid_w), avail_h / math.max(1, grid_h))
+			
+			local center_x = (width/2*16)*scale
+			local center_y = margin_y_top * scale
+			
+			love.graphics.push()
+			love.graphics.translate(center_x, center_y)
+			love.graphics.scale(fit_scale)
+
 			for i = 1, players do
-				local x = (width/2*16)*scale-29*scale
-				local y = (97 + (i-1)*20 - (players-1)*8)*scale
+				local col = math.floor((i-1) / rows)
+				local row = (i-1) % rows
+				local slot_center_x = (col - (cols-1)/2) * spacing_x * scale
+				local slot_y = row * spacing_y * scale
+				local x = slot_center_x - 29*scale
+				local y = slot_y
 				local v = characters.data[mariocharacter[i]]
 				
 				for j = 1, #characters.data[mariocharacter[i]]["animations"] do
@@ -302,11 +329,13 @@ function levelscreen_draw()
 				end
 				
 				if mariolivecount == false then
-					properprintfunc("*  inf", (width/2*16)*scale-8*scale, y+7*scale)
+					properprintfunc("*  inf", slot_center_x - 8*scale, y+7*scale)
 				else
-					properprintfunc("*  " .. mariolives[i], (width/2*16)*scale-8*scale, y+7*scale)
+					properprintfunc("*  " .. mariolives[i], slot_center_x - 8*scale, y+7*scale)
 				end
 			end
+			
+			love.graphics.pop()
 			
 			if mappack == "smb" and marioworld == 2 and mariolevel == 1 then
 				local s = "remember that you can run with "
