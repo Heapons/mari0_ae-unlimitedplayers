@@ -1639,6 +1639,9 @@ function loadconfig(nodefaultconfig)
 		end
 	end
 	
+	--cap it to 4 players to prevent lag
+	players = math.min(players, 4)
+
 	ensureplayerdefaults(players)
 	for i = 1, players do
 		if not portalhues[i] then
