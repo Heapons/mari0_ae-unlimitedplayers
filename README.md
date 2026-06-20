@@ -35,3 +35,4 @@ When enabled, players are able to deal damage to each others with their power-up
 - New setting: Friendly-Fire.
 - The Server IP and Port are now printed once in the chat upon creating a game.
 - The clipboard now gets fetched from your OS' clipboard, meaning that you can paste the Server Address more easily.
+- Every cheat is now synchronized between the server and the client(s).
