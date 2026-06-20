@@ -329,7 +329,7 @@ function levelscreen_draw()
 				end
 				
 				if not mariolivecount or infinitelives then
-					if i == 1 then
+					if players == 1 then
 						properprintfunc("* inf", slot_center_x - 8*scale, y+7*scale)
 					else
 						properprintfunc("*inf", slot_center_x - 8*scale, y+7*scale)
