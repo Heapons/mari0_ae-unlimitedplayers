@@ -16,6 +16,7 @@ local enemyspawnx
 local clientconnecttimer = 0
 local clientconnected = false
 local clientconnecttime = 4
+local clientconnectmsg
 
 local spamtimer = 0 --stop "funny" kids from spamming
 local spamtime = 0.2
@@ -29,7 +30,15 @@ function client_load(a, p)
 
 	udp = socket.udp()
 	udp:settimeout(0)
- 
+
+	local bind_ok, binderr = udp:setsockname("0.0.0.0", 0)
+	if not bind_ok then
+		print("Client bind failed: " .. tostring(binderr))
+		udp:close()
+		notice.new("could not bind socket", notice.red, 3)
+		return false
+	end
+	
 	local ok, err = udp:setpeername(address, port)
 	if not ok then
 		udp:close()
@@ -48,7 +57,11 @@ function client_load(a, p)
 	s = s:sub(1, -2)
 	
 	local dg = string.format("%s~%s~%s~%s~%s~%s", entity, 'connect', localnick, s, mariohats[playerconfig][1], tostring(mariocharacter[playerconfig]))
-	udp:send(dg)
+	clientconnectmsg = dg
+	local sent, senderr = udp:send(dg)
+	if not sent then
+		print("Connect send failed: " .. tostring(senderr))
+	end
 	updatetimer = 0
 	actions = {}
 	levelscreensync = false
@@ -70,7 +83,7 @@ function server_load(p)
 	entity = nil
 	clients = {}
 	
-	local ok, err = udp:setsockname("*", port)
+	local ok, err = udp:setsockname("0.0.0.0", port)
 	udp:settimeout(0)
 	if not ok then
 		notice.new("could not host: " .. tostring(err), notice.red, 3)
@@ -563,14 +576,17 @@ function client_update(dt)
 			end
 		elseif msg ~= 'timeout' then 
 			print("Network error: "..tostring(msg))
-			notice.new("Network error: "..tostring(msg), notice.red, 3)
-			net_quit()
 		end
 	until not data
 
 	--make sure client is actually connected
 	if not clientconnected then
 		clientconnecttimer = clientconnecttimer + dt
+		if clientconnecttimer > 1 and clientconnecttimer % 1 < dt then
+			if clientconnectmsg then
+				udp:send(clientconnectmsg)
+			end
+		end
 		if clientconnecttimer > clientconnecttime then
 			net_quit()
 			notice.new("Could not connnect", notice.red, 5)
