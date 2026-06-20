@@ -3737,6 +3737,28 @@ function drawplayer(i, x, y, r, pad, drop)
 		love.graphics.setColor(playerlist[v.playernumber].colors[1][1], playerlist[v.playernumber].colors[1][2], playerlist[v.playernumber].colors[1][3], 127)
 		properprintbackground(nick, math.floor(((px-xscroll+v.width/2)*16-((#nick*8)/2))*scale), math.floor(((py-yscroll)*16-28)*scale), true)--, background)
 	end
+	
+	--live counts above player heads (>4 active players)
+	if players > 4 and (not drop) and not (HITBOXDEBUG and HITBOXDEBUGANIMS) then
+		if mariolivecount ~= false and not infinitelives then
+			local livesstr = tostring(mariolives[v.playernumber] or 0)
+			if livesstr and #livesstr > 0 then
+				local color = mariocolors[v.playernumber] and mariocolors[v.playernumber][1] or {255, 255, 255}
+				local fontscale = 0.4
+				local totalw = #livesstr * 8 * fontscale
+				local xpos = math.floor(((px-xscroll+v.width/2)*16 - totalw/2)*scale)
+				local visualtop = (py-yscroll)*16 - v.offsetY - v.quadcenterY
+				local ypos
+				if (CLIENT or SERVER) and not NoOnlineMultiplayerNames then
+					ypos = math.floor((visualtop - 14)*scale)
+				else
+					ypos = math.floor((visualtop - 2)*scale)
+				end
+				love.graphics.setColor(color[1], color[2], color[3], 128)
+				properprintFbackground(livesstr, xpos, ypos, true, color, fontscale)
+			end
+		end
+	end
 end
 
 function drawHUD()
@@ -3872,47 +3894,73 @@ function drawmultiHUD()
 	end
 
 	if livesdisplay then
-		for i = 1, players do
-			--lives
-			local s
-			if (mariolivecount ~= false) and not infinitelives then
-				s = "p" .. i .. " * " .. mariolives[i]
-			else
-				s = "p" .. i
-			end
-
-			local x = (width*16)/players/2 + (width*16)/players*(i-1)
-			local cx = x-string.len(s)*4-4
-			local cy = 25 --offset y
-
-			--display lives
-			love.graphics.setColor(255, 255, 255, 255)
-			properprintfunc(s, (cx+8)*scale, cy*scale)
-			if hudoutline then
-				love.graphics.setColor(0, 0, 0)
-				love.graphics.rectangle("fill", (cx-1)*scale, (cy-1)*scale, 9*scale, 9*scale)
-			end
-			love.graphics.setColor(mariocolors[i][1])
-			love.graphics.rectangle("fill", (cx)*scale, cy*scale, 7*scale, 7*scale)
-			love.graphics.setColor(255, 255, 255, 255)
-			cy = cy + 10
-
-			if objects and objects["player"] and objects["player"][i] then
-				local p = objects["player"][i]
-				--health
-				if p.health and p.characterdata.healthimg then
-					love.graphics.setColor(255, 255, 255)
-					local s = "hp: " .. p.health
-					properprintfunc(s, cx*scale, cy*scale)
-					cy = cy + 10
+		if players <= 4 then
+			for i = 1, players do
+				--lives
+				local s
+				if (mariolivecount ~= false) and not infinitelives then
+					s = "p" .. i .. " * " .. mariolives[i]
+				else
+					s = "p" .. i
 				end
-				--keys
-				if p.key and p.key > 0 then
-					love.graphics.setColor(255, 255, 255)
-					local s = "*" .. p.key
-					love.graphics.draw(keyuiimg, keyuiquad[spriteset or 1][coinframe or 1], cx*scale, cy*scale, 0, scale, scale)
-					properprintfunc(s, (cx+9)*scale, cy*scale)
-					cy = cy + 10
+
+				local x = (width*16)/players/2 + (width*16)/players*(i-1)
+				local cx = x-string.len(s)*4-4
+				local cy = 25 --offset y
+
+				--display lives
+				love.graphics.setColor(255, 255, 255, 255)
+				properprintfunc(s, (cx+8)*scale, cy*scale)
+				if hudoutline then
+					love.graphics.setColor(0, 0, 0)
+					love.graphics.rectangle("fill", (cx-1)*scale, (cy-1)*scale, 9*scale, 9*scale)
+				end
+				love.graphics.setColor(mariocolors[i][1])
+				love.graphics.rectangle("fill", (cx)*scale, cy*scale, 7*scale, 7*scale)
+				love.graphics.setColor(255, 255, 255, 255)
+				cy = cy + 10
+
+				if objects and objects["player"] and objects["player"][i] then
+					local p = objects["player"][i]
+					--health
+					if p.health and p.characterdata.healthimg then
+						love.graphics.setColor(255, 255, 255)
+						local s = "hp: " .. p.health
+						properprintfunc(s, cx*scale, cy*scale)
+						cy = cy + 10
+					end
+					--keys
+					if p.key and p.key > 0 then
+						love.graphics.setColor(255, 255, 255)
+						local s = "*" .. p.key
+						love.graphics.draw(keyuiimg, keyuiquad[spriteset or 1][coinframe or 1], cx*scale, cy*scale, 0, scale, scale)
+						properprintfunc(s, (cx+9)*scale, cy*scale)
+						cy = cy + 10
+					end
+				end
+			end
+		else
+			for i = 1, players do
+				if objects and objects["player"] and objects["player"][i] then
+					local p = objects["player"][i]
+					local cx = (width*16)/players/2 + (width*16)/players*(i-1) - 20
+					local cy = 25
+
+					--health
+					if p.health and p.characterdata.healthimg then
+						love.graphics.setColor(255, 255, 255)
+						local s = "hp: " .. p.health
+						properprintfunc(s, cx*scale, cy*scale)
+						cy = cy + 10
+					end
+					--keys
+					if p.key and p.key > 0 then
+						love.graphics.setColor(255, 255, 255)
+						local s = "*" .. p.key
+						love.graphics.draw(keyuiimg, keyuiquad[spriteset or 1][coinframe or 1], cx*scale, cy*scale, 0, scale, scale)
+						properprintfunc(s, (cx+9)*scale, cy*scale)
+						cy = cy + 10
+					end
 				end
 			end
 		end

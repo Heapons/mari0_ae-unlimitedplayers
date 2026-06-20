@@ -328,10 +328,14 @@ function levelscreen_draw()
 					love.graphics.draw(v["animations"][0], v["small"]["idle"][3], x+(v.smalloffsetX)*scale, y+(11-v.smalloffsetY)*scale, 0, scale, scale, v.smallquadcenterX, v.smallquadcenterY)
 				end
 				
-				if mariolivecount == false then
-					properprintfunc("*  inf", slot_center_x - 8*scale, y+7*scale)
+				if not mariolivecount or infinitelives then
+					if i == 1 then
+						properprintfunc("* inf", slot_center_x - 8*scale, y+7*scale)
+					else
+						properprintfunc("*inf", slot_center_x - 8*scale, y+7*scale)
+					end
 				else
-					properprintfunc("*  " .. mariolives[i], slot_center_x - 8*scale, y+7*scale)
+					properprintfunc("* " .. mariolives[i], slot_center_x - 8*scale, y+7*scale)
 				end
 			end
 			

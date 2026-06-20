@@ -12,6 +12,10 @@ The only limit here is your <s>imagination</s> ***hardware***.
 > [!TIP]
 > Press **1** to quickly set to player count to one.
 
+### Features
+- Unlimited player slots.
+- Lives display on top of players when there are >4 active players.
+
 ## Cheats
 ### Friendly-Fire
 
