@@ -138,6 +138,7 @@ function ice:draw(enemylayer)
 	if (not enemylayer) and self.enemy and self.enemy.drawable then
 		return false
 	end
+	love.graphics.setColor(255, 255, 255, 255)
 	for x = 1, self.width*2 do
 		for y = 1, self.height*2 do
 			local q = 5
