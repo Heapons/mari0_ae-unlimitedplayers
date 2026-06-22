@@ -1,3 +1,4 @@
 makelove-build/
 .vscode/settings.json
 .idea/
+*.love
