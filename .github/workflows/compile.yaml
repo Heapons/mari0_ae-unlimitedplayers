@@ -3,12 +3,12 @@ on:
   push:
     paths-ignore:
       - README.md
-      - LICENSE
+      - LICENSE.txt
       - .gitignore
   pull_request:
     paths-ignore:
       - README.md
-      - LICENSE
+      - LICENSE.txt
       - .gitignore
   workflow_dispatch:
 
