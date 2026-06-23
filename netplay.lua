@@ -1,4 +1,4 @@
-local socket = require "socket"
+﻿local socket = require "socket"
 
 local udp
  
@@ -280,6 +280,10 @@ function server_update(dt)
 			server_darkmode(darkmode, clients[entity])
 			server_setmappack(mappack, clients[entity])
 			notice.new(playerlist[players].nick .. " connected", notice.white, 3)
+			--connect sound
+			if gamestate == "lobby" then
+				playsound(stompsound)
+			end
 		elseif cmd == 'pong' and safe then
 			--get ping
 			if clients[entity] and clients[entity].i and playerlist[clients[entity].i] then
@@ -310,6 +314,9 @@ function server_update(dt)
 		elseif cmd == 'disconnect' and safe then
 			server_disconnect(clients[entity].i)
 			clients[entity] = nil
+			if gamestate == "lobby" then
+				playsound(stompbigsound)
+			end
 		elseif cmd == 'move' and safe then
 			if objects then
 				net_moveplayer(clients[entity].i, t)
