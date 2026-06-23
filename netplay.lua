@@ -6,7 +6,7 @@ local address, port = "localhost", 27020
  
 local entity
 local clients
-local updaterate = 0.1
+local updaterate = 0.016
 local pingrate = 2
 local updatetimer --update timer
 local actions
@@ -25,24 +25,19 @@ local spammercount = 10
 
 local lobbytimeout = 12 --kick player if ping is higher than this (a ping this high means they've disconnected)
 
+local local_seq = 0
+local remote_seq = {}
+
 function client_load(a, p)
 	address, port = a or "localhost", p or 27020
 
 	udp = socket.udp()
 	udp:settimeout(0)
-
-	local bind_ok, binderr = udp:setsockname("0.0.0.0", 0)
-	if not bind_ok then
-		print("Client bind failed: " .. tostring(binderr))
+ 
+	udp:setpeername(address, port)
+	if tostring(udp) and not (tostring(udp):sub(1, 14) == "udp{connected}") then
 		udp:close()
-		notice.new("could not bind socket", notice.red, 3)
-		return false
-	end
-	
-	local ok, err = udp:setpeername(address, port)
-	if not ok then
-		udp:close()
-		notice.new("server not found: " .. tostring(err), notice.red, 3)
+		notice.new("server not found", notice.red, 3)
 		return false
 	end
  
@@ -69,6 +64,9 @@ function client_load(a, p)
 
 	clientconnected = false
 	clientconnecttimer = 0
+
+	local_seq = 0
+	remote_seq = {}
 	
 	SERVER = false
 	CLIENT = true
@@ -98,6 +96,9 @@ function server_load(p)
 	updatetimer = 0
 	actions = {}
 	enemyspawnx = 0
+
+	local_seq = 0
+	remote_seq = {}
 	
 	SERVER = true
 	CLIENT = false
@@ -172,7 +173,8 @@ function server_update(dt)
 							if (objects["player"][i].speedx ~= 0 or objects["player"][i].speedy ~= 0) or
 							((not objects["player"][i].oldx) or (objects["player"][i].oldx ~= objects["player"][i].x)) or
 							((not objects["player"][i].oldy) or (objects["player"][i].oldy ~= objects["player"][i].y)) then
-								local dg = string.format("%s~%s~%s~%s~%s~%s~%d~%s~%s", 'move', playerlist[i].id, x, y, speedx, speedy, gravity, animationstate, pointingangle)
+								local_seq = local_seq + 1
+								local dg = string.format("%s~%s~%d~%s~%s~%s~%s~%d~%s~%s", 'move', playerlist[i].id, local_seq, x, y, speedx, speedy, gravity, animationstate, pointingangle)
 								udp:sendto(dg, clients[entity][1], clients[entity][2])
 							end
 							objects["player"][i].oldx = objects["player"][i].x; objects["player"][i].oldy = objects["player"][i].y
@@ -319,7 +321,11 @@ function server_update(dt)
 			end
 		elseif cmd == 'move' and safe then
 			if objects then
-				net_moveplayer(clients[entity].i, t)
+				local msg_seq = tonumber(t[3]) or 0
+				if msg_seq > (remote_seq[entity] or 0) then
+					remote_seq[entity] = msg_seq
+					net_moveplayer(clients[entity].i, t)
+				end
 			end
 		elseif cmd == 'update' and safe then
 			--relay player information to clients
@@ -379,7 +385,8 @@ function client_update(dt)
 				if speedx == math.floor(speedx) then ft[1] = "d" end; if speedy == math.floor(speedy) then ft[2] = "d" end
 				
 				if (objects["player"][1].speedx ~= 0 or objects["player"][1].speedy ~= 0) or ((not objects["player"][1].oldx) or (objects["player"][1].oldx ~= objects["player"][1].x)) or ((not objects["player"][1].oldy) or (objects["player"][1].oldy ~= objects["player"][1].y)) then
-					local dg = string.format("%s~%s~%s~%s~%s~%s~%d~%s~%s", entity, 'move', x, y, speedx, speedy, gravity, animationstate, pointingangle)
+					local_seq = local_seq + 1
+					local dg = string.format("%s~%s~%d~%s~%s~%s~%s~%d~%s~%s", entity, 'move', local_seq, x, y, speedx, speedy, gravity, animationstate, pointingangle)
 					udp:send(dg)
 				end
 				objects["player"][1].oldx = objects["player"][1].x; objects["player"][1].oldy = objects["player"][1].y
@@ -502,7 +509,11 @@ function client_update(dt)
 						end
 					end
 					if i then
-						net_moveplayer(i, t)
+						local msg_seq = tonumber(t[3]) or 0
+						if msg_seq > (remote_seq[t[2]] or 0) then
+							remote_seq[t[2]] = msg_seq
+							net_moveplayer(i, t)
+						end
 					end
 				end
 			elseif cmd == 'action' then
@@ -634,7 +645,7 @@ function client_update(dt)
 		end
 		if clientconnecttimer > clientconnecttime then
 			net_quit()
-			notice.new("Could not connnect", notice.red, 5)
+			notice.new("Could not connect", notice.red, 5)
 			return
 		end
 	end
@@ -797,6 +808,10 @@ function server_disconnect(removei)
 	end
 	playerlist[removei].connected = false
 	notice.new(playerlist[removei].nick .. " disconnected", notice.white, 3)
+	if objects and objects["player"] and objects["player"][removei] then
+		objects["player"][removei]:die("disconnect")
+		table.remove(objects["player"], removei)
+	end
 	table.remove(playerlist, removei)
 	players = players - 1
 	local s = ""--player information
@@ -838,23 +853,23 @@ function net_moveplayer(player, t)
 	if not (objects and objects["player"] and objects["player"][player]) then
 		return
 	end
-	objects["player"][player].x = tonumber(t[3])
-	objects["player"][player].y = tonumber(t[4])
-	objects["player"][player].speedx = tonumber(t[5])
-	objects["player"][player].speedy = tonumber(t[6])
-	objects["player"][player].gravity = tonumber(t[7])
-	objects["player"][player].animationstate = t[8]
+	objects["player"][player].x = tonumber(t[4])
+	objects["player"][player].y = tonumber(t[5])
+	objects["player"][player].speedx = tonumber(t[6])
+	objects["player"][player].speedy = tonumber(t[7])
+	objects["player"][player].gravity = tonumber(t[8])
+	objects["player"][player].animationstate = t[9]
 	if objects["player"][player].animationstate == "dead" then
 		if (not objects["player"][player].dead) then
 			objects["player"][player]:die("lava")
 		end
 		objects["player"][player].dead = true
 	end
-	objects["player"][player]:setquad(t[8])
-	if tonumber(t[9]) then
-		objects["player"][player].pointingangle = tonumber(t[9])
+	objects["player"][player]:setquad(t[9])
+	if tonumber(t[10]) then
+		objects["player"][player].pointingangle = tonumber(t[10])
 	else --no portal gun
-		objects["player"][player].animationdirection = t[9]
+		objects["player"][player].animationdirection = t[10]
 	end
 end
 
