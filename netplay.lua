@@ -238,6 +238,8 @@ function server_update(dt)
 			clients[entity].i = #playerlist
 			clients[entity].nick = t[3] or entity
 			players = #playerlist
+			mariocolors[players] = color
+			mariohats[players] = {hat}
 			local s = ""--player information
 			for i = 1, #playerlist do
 				local c = "" --colors
@@ -458,6 +460,12 @@ function client_update(dt)
 							controls[i]["reload"] = {""}
 							controls[i]["use"] = {""}
 						end
+					end
+				end
+				for i = 1, players do
+					if playerlist[i] then
+						mariocolors[i] = playerlist[i].colors
+						mariohats[i] = playerlist[i].hats
 					end
 				end
 			elseif cmd == 'ping' then
