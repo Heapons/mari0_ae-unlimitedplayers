@@ -731,9 +731,8 @@ function net_sendchat(s)
 		if gamestate == "game" and s:find("/") then
 			net_command(s)
 		elseif s == "/disablecheats" then
-			for i, t in pairs(clients) do
-				udp:sendto('disablecheats', t[1], t[2])
-			end
+			disablecheats()
+			server_syncallsettings()
 			notice.new("cheats disabled", notice.white, 3)
 		end
 	else
@@ -1090,6 +1089,24 @@ function server_friendlyfire(bool, t)
 		end
 	else
 		udp:sendto(string.format("%s~%s", 'friendlyfire', tostring(bool)), t[1], t[2])
+	end
+end
+
+function server_syncallsettings()
+	for i, t in pairs(clients) do
+		udp:sendto(string.format("%s~%s", 'infinitelives', tostring(infinitelives)), t[1], t[2])
+		udp:sendto(string.format("%s~%s", 'infinitetime', tostring(infinitetime)), t[1], t[2])
+		udp:sendto(string.format("%s~%s", 'friendlyfire', tostring(friendlyfire)), t[1], t[2])
+		udp:sendto(string.format("%s~%s", 'playertype', tostring(playertype)), t[1], t[2])
+		udp:sendto(string.format("%s~%s", 'playertypei', tostring(playertypei)), t[1], t[2])
+		udp:sendto(string.format("%s~%s", 'bullettime', tostring(bullettime)), t[1], t[2])
+		udp:sendto(string.format("%s~%s", 'speedtarget', tostring(speedtarget)), t[1], t[2])
+		udp:sendto(string.format("%s~%s", 'portalknockback', tostring(portalknockback)), t[1], t[2])
+		udp:sendto(string.format("%s~%s", 'bigmario', tostring(bigmario)), t[1], t[2])
+		udp:sendto(string.format("%s~%s", 'goombaattack', tostring(goombaattack)), t[1], t[2])
+		udp:sendto(string.format("%s~%s", 'sonicrainboom', tostring(sonicrainboom)), t[1], t[2])
+		udp:sendto(string.format("%s~%s", 'playercollisions', tostring(playercollisions)), t[1], t[2])
+		udp:sendto(string.format("%s~%s", 'darkmode', tostring(darkmode)), t[1], t[2])
 	end
 end
 

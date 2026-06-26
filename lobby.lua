@@ -1,4 +1,27 @@
 local onlinenotice = false
+lobbysettingsopen = false
+lobbysettingsselection = 1
+lobbysettingstab = 1
+
+lobbySettingsTabs = {
+	{
+		name = "cheats",
+		displayName = TEXT["cheats"] or "Cheats",
+		items = {
+			{name = "mode", var = "playertype", type = "list", list = playertypelist, index = "playertypei"},
+			{name = "knockback", var = "portalknockback", type = "bool"},
+			{name = "bullettime", var = "bullettime", type = "bool"},
+			{name = "huge mario", var = "bigmario", type = "bool"},
+			{name = "goomba attack", var = "goombaattack", type = "bool"},
+			{name = "sonic rainboom", var = "sonicrainboom", type = "bool"},
+			{name = "playercollision", var = "playercollisions", type = "bool"},
+			{name = "infinite time", var = "infinitetime", type = "bool"},
+			{name = "infinite lives", var = "infinitelives", type = "bool"},
+			{name = "dark mode", var = "darkmode", type = "bool"},
+			{name = "friendly fire", var = "friendlyfire", type = "bool"},
+		}
+	}
+}
 
 function lobby_load()
 	collectables = {} --[marioworld-mariolevel-mariosublevel][x-y]
@@ -8,17 +31,19 @@ function lobby_load()
 	gamestate = "lobby"
 	guielements = {}
 	guielements.chatentry = guielement:new("input", 4, 207, 43+7/8, sendchat, "", 43)
+	guielements.chatentry.active = true
 	guielements.sendbutton = guielement:new("button", 359, 207, "send", sendchat, 1)
+	guielements.sendbutton.active = true
 	guielements.playerscroll = guielement:new("scrollbar", 389, 3, 104, 8, 50, 0)
 	
 	chatmessages = {}
 	
-	guielements.infinitelives = guielement:new("checkbox", 7, 20, 
-		function() if SERVER then infinitelives = not infinitelives; guielements.infinitelives.var = infinitelives; server_infinitelives(infinitelives) end end, infinitelives, "infinite lives")
-	guielements.infinitetime = guielement:new("checkbox", 7, 33,
-		function() if SERVER then infinitetime = not infinitetime; guielements.infinitetime.var = infinitetime; server_infinitetime(infinitetime) end end, infinitetime, "infinite time")
-	guielements.friendlyfire = guielement:new("checkbox", 7, 46,
-		function() if SERVER then friendlyfire = not friendlyfire; guielements.friendlyfire.var = friendlyfire; server_friendlyfire(friendlyfire) end end, friendlyfire, "friendly fire")
+	guielements.settingsbutton = guielement:new("button", 7, 20, "settings", 
+		function() 
+			lobbysettingsopen = true
+			lobbysettingsselection = 1 
+			lobbysettingstab = 1
+		end, 1)
 	if not mappacklist then--load mappack list
 		loadmappacks()
 	end
@@ -40,8 +65,6 @@ function lobby_load()
 	guielements.mappackright = guielement:new("button", 219, 57, "}",
 		function() mappackselection = math.min(#mappacklist, mappackselection+1); guielements.mappack.text = mappacklist[mappackselection]:lower(); guielements.mappack.textcolor = {127, 127, 127} end, 1)
 	if CLIENT then
-		guielements.infinitelives.active = false
-		guielements.infinitetime.active = false
 		guielements.mappack.active = false
 		guielements.mappack.textcolor = {127, 127, 127}
 		guielements.mappackleft.active = false
@@ -97,10 +120,7 @@ function lobby_draw()
 	love.graphics.rectangle("fill", 3*scale, 3*scale, 233*scale, 104*scale)
 	
 	love.graphics.setColor(255, 255, 255, 255)
-	properprintF("settings", 9*scale, 9*scale)
-	guielements.infinitelives:draw()
-	guielements.infinitetime:draw()
-	guielements.friendlyfire:draw()
+	guielements.settingsbutton:draw()
 	properprintF("mappack", 9*scale, 46*scale)
 	guielements.mappack:draw()
 	guielements.mappackleft:draw()
@@ -147,6 +167,137 @@ function lobby_draw()
 	
 	--chat
 	lobby_drawchat()
+
+	--settings
+	if lobbysettingsopen then
+		local currentTab = lobbySettingsTabs[lobbysettingstab]
+		local items = currentTab.items
+		local isClient = CLIENT and not SERVER
+		
+		local minDialogWidth = 200
+		local maxDialogWidth = 300
+		local itemHeight = 13
+		local padding = 10
+		local titleHeight = 20
+		local tabHeight = 11
+		
+		local maxItemWidth = 0
+		for i = 1, #items do
+			local item = items[i]
+			local displayName = TEXT[item.name .. ":"]
+			if not displayName or displayName == item.name .. ":" then
+				displayName = item.name .. ":"
+			end
+			
+			local valueText = ""
+			if item.type == "bool" then
+				local val = _G[item.var]
+				valueText = val and (TEXT["on"] or "on") or (TEXT["off"] or "off")
+			elseif item.type == "list" then
+				local val = _G[item.index]
+				local list = item.list
+				valueText = "{" .. list[val] .. "}"
+			end
+			
+			local nameWidth = utf8.len(displayName) * 8
+			local valueWidth = utf8.len(valueText) * 8
+			local itemWidth = nameWidth + valueWidth + 40
+			maxItemWidth = math.max(maxItemWidth, itemWidth)
+		end
+		
+		local tabWidth = 0
+		for tabIndex, tab in ipairs(lobbySettingsTabs) do
+			local tabText = tab.displayName
+			local tabTextWidth = utf8.len(tabText) * 8 + 6
+			tabWidth = tabWidth + tabTextWidth
+		end
+		
+		local dialogWidth = math.max(minDialogWidth, math.min(maxDialogWidth, math.max(tabWidth, maxItemWidth)))
+		
+		local clientNoticeHeight = isClient and 14 or 0
+		local dialogHeight = titleHeight + tabHeight + (#items * itemHeight) + padding * 2 + clientNoticeHeight
+		
+		local dialogX = (width*8*scale) - (dialogWidth*scale)/2
+		local dialogY = (height*8*scale) - (dialogHeight*scale)/2
+		
+		love.graphics.setColor(0, 0, 0, 100)
+		love.graphics.rectangle("fill", 0, 0, width*16*scale, height*16*scale)
+		
+		love.graphics.setColor(0, 0, 0)
+		love.graphics.rectangle("fill", dialogX, dialogY, dialogWidth*scale, dialogHeight*scale)
+		love.graphics.setColor(255, 255, 255)
+		drawrectangle(dialogX/scale, dialogY/scale, dialogWidth, dialogHeight)
+		
+		local titleText = TEXT["settings"] or "Settings"
+		properprintF(titleText, dialogX + (dialogWidth*scale)/2 - utf8.len(titleText)*4*scale, dialogY + 5*scale)
+		
+		local tabX = dialogX + 5 * scale
+		local tabY = dialogY + titleHeight * scale
+		for tabIndex, tab in ipairs(lobbySettingsTabs) do
+			local tabText = tab.displayName
+			local tabTextWidth = utf8.len(tabText) * 8
+			
+			if isClient then
+				if tabIndex == lobbysettingstab then
+					love.graphics.setColor(60, 60, 60, 100)
+					love.graphics.rectangle("fill", (tabX - 1*scale), tabY, (tabTextWidth + 3)*scale, tabHeight*scale)
+				end
+				love.graphics.setColor(80, 80, 80, 255)
+			else
+				if tabIndex == lobbysettingstab then
+					love.graphics.setColor(100, 100, 100, 100)
+					love.graphics.rectangle("fill", (tabX - 1*scale), tabY, (tabTextWidth + 3)*scale, tabHeight*scale)
+				end
+				if lobbysettingsselection == 1 and tabIndex == lobbysettingstab then
+					love.graphics.setColor(255, 255, 255, 255)
+				else
+					love.graphics.setColor(100, 100, 100, 255)
+				end
+			end
+			properprint(tabText, tabX, tabY + 2*scale)
+			
+			tabX = tabX + (tabTextWidth + 6)*scale
+		end
+		
+		for i = 1, #items do
+			local itemY = dialogY + (titleHeight + tabHeight + padding) * scale + (i - 1) * itemHeight * scale
+			local itemX = dialogX + 5 * scale
+			
+			if isClient then
+				love.graphics.setColor(80, 80, 80, 255)
+			else
+				love.graphics.setColor(100, 100, 100, 255)
+				if lobbysettingsselection == i + 1 then
+					love.graphics.setColor(255, 255, 255, 255)
+					properprint(">", itemX, itemY)
+				end
+			end
+			
+			local item = items[i]
+			local displayName = TEXT[item.name .. ":"]
+			if not displayName or displayName == item.name .. ":" then
+				displayName = item.name .. ":"
+			end
+			
+			properprintF(displayName, itemX + 10*scale, itemY)
+			
+			local valueText = ""
+			if item.type == "bool" then
+				local val = _G[item.var]
+				valueText = val and (TEXT["on"] or "on") or (TEXT["off"] or "off")
+			elseif item.type == "list" then
+				local val = _G[item.index]
+				local list = item.list
+				valueText = "{" .. list[val] .. "}"
+			end
+			
+			local valueX = dialogX + (dialogWidth - utf8.len(valueText) * 8 - 10) * scale
+			if isClient then
+				love.graphics.setColor(80, 80, 80, 255)
+			end
+			properprintF(valueText, valueX, itemY)
+		end
+	end
 end
 
 function sendchat()

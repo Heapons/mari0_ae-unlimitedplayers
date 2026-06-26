@@ -2846,6 +2846,49 @@ function menu_keypressed(key, unicode)
 			gamestate = "menu"
 			saveconfig()
 		end
+	elseif gamestate == "lobby" then
+		if lobbysettingsopen then
+			local currentTab = lobbySettingsTabs[lobbysettingstab]
+			local items = currentTab.items
+			local isClient = CLIENT and not SERVER
+			
+			local function changeItemValue(delta)
+				local item = items[lobbysettingsselection - 1]
+				if item.type == "bool" then
+					_G[item.var] = not _G[item.var]
+				elseif item.type == "list" then
+					local idx = _G[item.index] + delta
+					if idx < 1 then idx = #item.list
+					elseif idx > #item.list then idx = 1 end
+					_G[item.index] = idx
+					_G[item.var] = item.list[idx]
+				end
+				if SERVER then server_syncallsettings() end
+			end
+			
+			if (key == "up" or key == "w") then
+				lobbysettingsselection = lobbysettingsselection > 1 and lobbysettingsselection - 1 or #items + 1
+			elseif (key == "down" or key == "s") then
+				lobbysettingsselection = lobbysettingsselection < #items + 1 and lobbysettingsselection + 1 or 1
+			elseif (key == "left" or key == "a") then
+				if lobbysettingsselection == 1 then
+					lobbysettingstab = lobbysettingstab - 1
+					if lobbysettingstab < 1 then lobbysettingstab = #lobbySettingsTabs end
+				elseif not isClient then
+					changeItemValue(-1)
+				end
+			elseif (key == "right" or key == "d") then
+				if lobbysettingsselection == 1 then
+					lobbysettingstab = lobbysettingstab + 1
+					if lobbysettingstab > #lobbySettingsTabs then lobbysettingstab = 1 end
+				elseif not isClient then
+					changeItemValue(1)
+				end
+			elseif key == "escape" then
+				lobbysettingsopen = false
+			end
+			return
+		end
 	end
 end
 
